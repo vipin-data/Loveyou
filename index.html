@@ -3,65 +3,326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Text</title>
+    <title>A Unique Birthday Wish</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+        /* Font and core styling */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
         body {
-            font-family: 'Pacifico', cursive;
-            background-color: #1a1a2e;
-            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
             overflow: hidden;
+            height: 100vh;
             position: relative;
         }
-        
-        /* Love-themed background animation */
+
+        /* Background grid animation */
         body::before {
             content: '';
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, rgba(255, 105, 180, 0.1) 0%, rgba(26, 26, 46, 0) 70%);
-            animation: backgroundPulse 15s infinite ease-in-out;
-            z-index: -1;
+            background: radial-gradient(circle, rgba(46, 160, 67, 0.1) 1px, transparent 1px), radial-gradient(circle, rgba(35, 134, 54, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px, 50px 50px;
+            background-position: 0 0, 25px 25px;
+            animation: moveBackground 60s linear infinite;
         }
 
-        @keyframes backgroundPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        @keyframes moveBackground {
+            from { background-position: 0 0, 25px 25px; }
+            to { background-position: 500px 500px, 525px 525px; }
         }
 
-        .container {
+        /* Main app container */
+        #app {
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* Card styling */
+        .card {
+            background: rgba(22, 27, 34, 0.9);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(48, 54, 61, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            max-width: 90vw;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            flex-direction: column;
-            position: relative;
-            padding: 2rem;
         }
 
-        .text-container {
-            font-size: 5rem;
-            text-align: center;
-            opacity: 0;
-            animation: fadeIn 2s ease-in-out forwards;
-            position: relative;
-            transform-origin: center;
-            z-index: 10; /* Make sure text is above hearts */
+        /* Page switching */
+        .page-content {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .visible {
+            display: flex;
+        }
+
+        /* Button styling */
+        .btn {
+            background-color: #238636;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(35, 134, 54, 0.5);
+        }
+
+        .btn:hover {
+            background-color: #2ea043;
+            transform: translateY(-2px);
         }
         
+        /* Typing text effect */
+        .typing-text::after {
+            content: '|';
+            animation: blink-caret .75s step-end infinite;
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: white; }
+        }
+
+        /* Main fade-in animation */
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Particle animation (confetti effect) */
+        .particle-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .popped-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            opacity: 0;
+            border-radius: 50%;
+            animation: shoot-up 3s ease-out forwards;
+        }
+
+        @keyframes shoot-up {
+            0% { transform: translateY(0) scale(1) translateX(var(--start-x)); opacity: 1; }
+            100% { transform: translateY(var(--end-y)) scale(0.5) translateX(var(--end-x)) rotate(var(--rotation-end)); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Particle container for the confetti effect -->
+        <div class="particle-container"></div>
+
+        <!-- Landing Page -->
+        <div id="landing-page" class="page-content visible">
+            <div class="flex flex-col items-center justify-center p-8 bg-gray-800 bg-opacity-70 rounded-3xl shadow-2xl backdrop-blur-md border border-gray-700">
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 animate-text-glow">
+                    A Special Message for You
+                </h1>
+                <p class="text-lg sm:text-xl text-gray-300 mb-8">Click to begin your celebration.</p>
+                <button id="startButton" class="btn text-xl animate-pulse">Start</button>
+            </div>
+        </div>
+
+        <!-- Main Content (Pages 1-3) -->
+        <div id="main-content" class="page-content">
+            <div id="wish-pages-container" class="relative w-full h-full">
+
+                <!-- Page 1: Main Wish -->
+                <div id="page1" class="page-content visible">
+                    <div class="card w-full h-full flex flex-col justify-between">
+                        <div class="flex-grow flex flex-col justify-center">
+                            <h2 class="text-3xl sm:text-4xl font-bold mb-4">Happy Birthday!</h2>
+                            <p id="typed-wish" class="text-xl sm:text-2xl mt-4 typing-text"></p>
+                        </div>
+                        <button id="nextPage1" class="btn text-lg mt-8">Next</button>
+                    </div>
+                </div>
+
+                <!-- Page 2: Fun Fact -->
+                <div id="page2" class="page-content">
+                    <div class="card w-full h-full flex flex-col justify-between">
+                        <div class="flex-grow flex flex-col justify-center">
+                            <h2 class="text-3xl sm:text-4xl font-bold mb-4">A Fun Fact for You</h2>
+                            <p id="fact-text" class="text-lg sm:text-xl mt-4 text-gray-300"></p>
+                        </div>
+                        <button id="nextPage2" class="btn text-lg mt-8">Next</button>
+                    </div>
+                </div>
+
+                <!-- Page 3: Final Wish -->
+                <div id="page3" class="page-content">
+                    <div class="card w-full h-full flex flex-col justify-between">
+                        <div class="flex-grow flex flex-col justify-center">
+                            <h2 class="text-3xl sm:text-4xl font-bold mb-4">Wishing you well.</h2>
+                            <p class="text-xl sm:text-2xl mt-4 text-gray-200">
+                                May the year ahead be filled with moments of joy, growth, and unexpected success. May you find happiness in your endeavors and strength in every challenge. Happy Birthday!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const landingPage = document.getElementById('landing-page');
+            const mainContent = document.getElementById('main-content');
+            const startButton = document.getElementById('startButton');
+            const typedWishElement = document.getElementById('typed-wish');
+            const factTextElement = document.getElementById('fact-text');
+            const particleContainer = document.querySelector('.particle-container');
+
+            // Pages and buttons
+            const pages = [
+                document.getElementById('page1'),
+                document.getElementById('page2'),
+                document.getElementById('page3')
+            ];
+            const nextButtons = [
+                document.getElementById('nextPage1'),
+                document.getElementById('nextPage2')
+            ];
+
+            let currentPageIndex = 0;
+            let wishes = [
+                "Wishing you a year filled with remarkable achievements and genuine happiness. May your special day mark the beginning of a truly fantastic new chapter in your life.",
+                "Here's to a birthday celebrated with good company and a bright outlook. May the year ahead bring you prosperity, health, and all the opportunities you've been working for.",
+                "Happy Birthday! May your day be as unique and promising as you are. I hope this new year of your life is full of joyful moments and personal success."
+            ];
+            let facts = [
+                "The 'Happy Birthday' song is one of the most recognized songs in the English language, translated into at least 18 different languages.",
+                "The birthday cake tradition dates back to ancient Rome, where they were made with flour, nuts, and sweetened with honey.",
+                "The tradition of blowing out birthday candles originated with the ancient Greeks, who used them to make a wish to the gods."
+            ];
+
+            // Functions to manage page flow
+            const showPage = (index) => {
+                pages.forEach((page, i) => {
+                    page.classList.toggle('visible', i === index);
+                });
+            };
+
+            const goToNextPage = () => {
+                if (currentPageIndex < pages.length - 1) {
+                    currentPageIndex++;
+                    showPage(currentPageIndex);
+                }
+            };
+
+            // Event Listeners
+            startButton.addEventListener('click', () => {
+                landingPage.classList.remove('visible');
+                landingPage.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                mainContent.classList.add('visible');
+                showPage(0);
+                typeWish();
+                createParticles(100); // Trigger particles on start
+            });
+            
+            nextButtons.forEach((btn) => {
+                btn.addEventListener('click', goToNextPage);
+            });
+
+            // Particle Animation (Confetti)
+            const createParticles = (count) => {
+                const colors = ['#e63946', '#f4a261', '#2a9d8f', '#264653', '#e76f51'];
+                for (let i = 0; i < count; i++) {
+                    const piece = document.createElement('div');
+                    piece.classList.add('popped-piece');
+                    
+                    const startX = Math.random() * 80 - 40;
+                    const endX = Math.random() * 500 - 250;
+                    const endY = -1 * (Math.random() * 500 + 400);
+                    const rotationEnd = Math.random() * 1440 - 720;
+                    
+                    piece.style.bottom = '0';
+                    piece.style.left = '50%';
+                    piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    piece.style.setProperty('--start-x', `${startX}px`);
+                    piece.style.setProperty('--end-x', `${endX}px`);
+                    piece.style.setProperty('--end-y', `${endY}px`);
+                    piece.style.setProperty('--rotation-end', `${rotationEnd}deg`);
+                    piece.style.animationDelay = `${Math.random() * 0.5}s`;
+                    particleContainer.appendChild(piece);
+
+                    piece.addEventListener('animationend', () => {
+                        piece.remove();
+                    });
+                }
+            };
+
+            // Page 1: Typing Wish
+            const typeWish = () => {
+                const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
+                let i = 0;
+                typedWishElement.textContent = '';
+                const speed = 40;
+
+                const type = () => {
+                    if (i < randomWish.length) {
+                        typedWishElement.textContent += randomWish.charAt(i);
+                        i++;
+                        setTimeout(type, speed);
+                    } else {
+                        typedWishElement.classList.remove('typing-text');
+                    }
+                };
+                typedWishElement.classList.add('typing-text');
+                type();
+            };
+
+            // Page 2: Fun Fact
+            pages[1].addEventListener('transitionend', () => {
+                if (currentPageIndex === 1) {
+                    const randomFact = facts[Math.floor(Math.random() * facts.length)];
+                    factTextElement.textContent = randomFact;
+                }
+            });
+            
+            // Initial setup
+            showPage(0);
+        });
+    </script>
+</body>
+</html>
         }
         
         .animated-text {
